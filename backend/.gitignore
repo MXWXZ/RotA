@@ -1,0 +1,7 @@
+go.sum
+.vscode/
+.idea/
+bin/go_build_main_go
+bin/rota
+*.coverprofile
+__pycache__/

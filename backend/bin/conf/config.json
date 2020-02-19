@@ -1,0 +1,8 @@
+{
+    "LogLevel": "debug",
+    "LogPath": "",
+    "TCPAddr": "127.0.0.1:1926",
+    "WSAddr": "127.0.0.1:1927",
+    "MaxConnNum": 20000,
+    "DBName": "rota"
+}
