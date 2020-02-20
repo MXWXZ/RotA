@@ -1,35 +1,24 @@
 package internal
 
 import (
-	"reflect"
 	"rota/msg"
 	"rota/util"
-
-	"github.com/name5566/leaf/gate"
 )
 
-func handler(m interface{}, h interface{}) {
-	Skeleton.RegisterChanRPC(reflect.TypeOf(m), h)
-}
-
 func init() {
-	handler(&msg.GetRooms{}, handleGetRooms)
+	util.Handler(Skeleton, &msg.GetRooms{}, checkUser(handleGetRooms))
+	util.Handler(Skeleton, &msg.NewRoom{}, checkUser(handleNewRoom))
 }
 
 var rooms []msg.RoomInfo
 
-func handleGetRooms(args []interface{}) {
-	m := args[0].(*msg.GetRooms)
-	a := args[1].(gate.Agent)
-	t := "GetRooms"
+func handleNewRoom(args []interface{}) {
 
-	id, name := util.CheckToken(m.Token)
-	if id == 0 {
-		msg.Send403(a, t)
-		return
-	}
-	Agents[a].ID = id
-	Agents[a].Name = name
+}
+
+func handleGetRooms(args []interface{}) {
+	var m *msg.GetRooms
+	a, t := util.GetArgs(args, &m)
 
 	if m.Limit < 0 || m.Offset < 0 {
 		msg.Send400(a, t)

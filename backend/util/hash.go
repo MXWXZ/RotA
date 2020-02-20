@@ -19,7 +19,7 @@ func HashPwd(pwd string) string {
 }
 
 func GetToken() string {
-	b := make([]byte, 16)
+	b := make([]byte, 32)
 	_, err := rand.Read(b)
 	if err != nil {
 		log.Fatal("%v", err)

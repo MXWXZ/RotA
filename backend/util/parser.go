@@ -3,11 +3,10 @@ package util
 import (
 	"bytes"
 	"fmt"
-	"rota/db"
-	"strconv"
-	"time"
+	"reflect"
 
-	"github.com/name5566/leaf/log"
+	"github.com/name5566/leaf/gate"
+	"github.com/name5566/leaf/module"
 )
 
 // IsEmpty check param zero value
@@ -45,23 +44,12 @@ func RequireParam(v ...interface{}) bool {
 	return true
 }
 
-// CheckToken check and update token
-func CheckToken(token string) (int, string) {
-	if token == "" {
-		return 0, ""
-	}
+func GetArgs(args []interface{}, m interface{}) (gate.Agent, string) {
+	v := reflect.ValueOf(m)
+	v.Elem().Set(reflect.ValueOf(args[0]))
+	return args[1].(gate.Agent), v.Elem().Type().String()[5:]
+}
 
-	db.InitRS() // if opened it will not open again
-	res, err := db.RSClient.HMGet(token, "ID", "Name").Result()
-	if err != nil || res[0] == nil || res[1] == nil {
-		return 0, ""
-	}
-	db.RSClient.Expire(token, 30*time.Minute) // reset expire time
-
-	id, err := strconv.Atoi(res[0].(string))
-	if err != nil {
-		log.Error("%v", err)
-	}
-	// no need to close redis
-	return id, res[1].(string)
+func Handler(s *module.Skeleton, m interface{}, h interface{}) {
+	s.RegisterChanRPC(reflect.TypeOf(m), h)
 }

@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
-	"github.com/name5566/leaf/gate"
 	"github.com/name5566/leaf/log"
 )
 
@@ -36,9 +35,8 @@ func checkUser(n string, p string) (*db.User, error) {
 }
 
 func handleSignup(args []interface{}) {
-	m := args[0].(*msg.Signup)
-	a := args[1].(gate.Agent)
-	t := "Signup"
+	var m *msg.Signup
+	a, t := util.GetArgs(args, &m)
 
 	if !util.RequireParam(m.UserName, m.UserPass) {
 		msg.Send400(a, t)
@@ -60,9 +58,8 @@ func handleSignup(args []interface{}) {
 }
 
 func handleLogin(args []interface{}) {
-	m := args[0].(*msg.Login)
-	a := args[1].(gate.Agent)
-	t := "Login"
+	var m *msg.Login
+	a, t := util.GetArgs(args, &m)
 
 	if !util.RequireParam(m.UserName, m.UserPass) {
 		msg.Send400(a, t)
@@ -83,7 +80,7 @@ func handleLogin(args []interface{}) {
 		"ID":   ret.ID,
 		"Name": ret.UserName,
 	})
-	db.RSClient.Expire(token, 30*time.Minute)
+	db.RSClient.Expire(token, 1*time.Hour)
 	msg.Send200(a, t, &msg.LoginRsp{
 		Status: 0,
 		ID:     ret.ID,

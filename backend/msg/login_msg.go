@@ -3,6 +3,7 @@ package msg
 func LoginMsgInit() {
 	Processor.Register(&Login{})
 	Processor.Register(&Signup{})
+	Processor.Register(&CheckToken{})
 }
 
 /**
@@ -17,7 +18,7 @@ func LoginMsgInit() {
  * @apiParam {string} UserPass user password
  * @apiSuccess {int32} Status 0 for success, 1 for invalid
  * @apiSuccess {int32} ID user id
- * @apiSuccess {string} Token 32 length token for success
+ * @apiSuccess {string} Token 64 length token for success
  * @apiUse InvalidParam
  * @apiUse ServerError
  */
@@ -52,5 +53,28 @@ type Signup struct {
 }
 
 type SignupRsp struct {
+	Status int32
+}
+
+/**
+ * @api {WS} CheckToken CheckToken
+ * @apiVersion 1.0.0
+ * @apiGroup User
+ * @apiPermission client
+ * @apiName CheckToken
+ * @apiDescription Check user token
+ *
+ * @apiParam {int32} ID user id
+ * @apiParam {string} Token 64 length token
+ * @apiSuccess {int32} Status 0 for success, 1 for invalid
+ * @apiUse InvalidParam
+ * @apiUse ServerError
+ */
+type CheckToken struct {
+	ID    int32
+	Token string
+}
+
+type CheckTokenRsp struct {
 	Status int32
 }

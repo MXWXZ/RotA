@@ -2,6 +2,7 @@ package internal
 
 import (
 	"rota/base"
+	"rota/db"
 
 	"github.com/name5566/leaf/module"
 )
@@ -17,8 +18,9 @@ type Module struct {
 
 func (m *Module) OnInit() {
 	m.Skeleton = Skeleton
+	db.InitRS()
 }
 
 func (m *Module) OnDestroy() {
-
+	db.CloseRS()
 }
