@@ -16,18 +16,17 @@ func init() {
 
 func handleCheckToken(args []interface{}) {
 	var m *msg.CheckToken
-	a, t := util.GetArgs(args, &m)
+	a := util.GetArgs(args, &m)
 
 	if !util.RequireParam(m.ID, m.Token) {
-		msg.Send400(a, t)
 		return
 	}
 
 	res, err := db.RSClient.HMGet(m.Token, "ID", "Name").Result()
 	if err != nil || res[0] == nil || res[1] == nil || strconv.Itoa(int(m.ID)) != res[0].(string) {
 		agents[a].Reset()
-		log.Release("user id \"%v\" token invalid", m.ID)
-		msg.Send200(a, t, &msg.CheckTokenRsp{Status: 1})
+		log.Error("User [%v] token invalid", m.ID)
+		msg.Send(a, &msg.CheckTokenRsp{Code: 1})
 		return
 	}
 	db.RSClient.Expire(m.Token, 1*time.Hour) // reset expire time
@@ -39,6 +38,12 @@ func handleCheckToken(args []interface{}) {
 
 	agents[a].ID = id
 	agents[a].Name = res[1].(string)
-	msg.Send200(a, t, &msg.CheckTokenRsp{Status: 0})
-	log.Release("user \"%v\" token valid", agents[a].Name)
+	msg.Send(a, &msg.CheckTokenRsp{
+		Code:   0,
+		ID:     agents[a].ID,
+		Name:   agents[a].Name,
+		Room:   agents[a].Room,
+		Status: agents[a].Status,
+	})
+	log.Release("User [%v] token valid", m.ID)
 }

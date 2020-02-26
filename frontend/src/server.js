@@ -1,22 +1,35 @@
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import { message } from 'antd';
 
-var ws = null
-var evt = {}
+var ws = new ReconnectingWebSocket(process.env.REACT_APP_BACKEND);
+var evt = {};
+var checked = false;
 
 class Server {
-    static Connect() {
-        return new Promise((resolve, reject) => {
-            if (!ws) {
-                ws = new ReconnectingWebSocket(process.env.REACT_APP_BACKEND);
-                evt = {}
-                ws.addEventListener('message', this.handler);
-                ws.addEventListener('open', () => {
-                    resolve();
-                });
-            } else {
-                resolve();
-            }
-        })
+    static CheckToken(cb) {
+        if (checked === false) {
+            Server.AddHandler("CheckTokenRsp", (data) => {
+                if (data.Msg.Code === 1) {
+                    message.error("凭据已过期，请重新登录");
+                    sessionStorage.clear();
+                    setTimeout(() => {
+                        window.location.href = "/"
+                    }, 1000);
+                } else {
+                    sessionStorage.setItem('name', data.Msg.Name);
+                    sessionStorage.setItem('room', data.Msg.Room);
+                    sessionStorage.setItem('status', data.Msg.Status);
+                    checked = true;
+                    cb();
+                }
+            });
+            Server.Send("CheckToken", {
+                ID: parseInt(sessionStorage.getItem('id')),
+                Token: sessionStorage.getItem('token'),
+            });
+        } else {
+            cb();
+        }
     }
 
     static AddHandler(n, h) {
@@ -41,5 +54,13 @@ class Server {
         ws.send(JSON.stringify(msg));
     }
 }
+
+ws.addEventListener('message', Server.handler);
+Server.AddHandler("NeedTokenRsp", () => {
+    Server.CheckToken(() => {
+        message.success("重新连接成功");
+    });
+    return true;
+});
 
 export default Server;

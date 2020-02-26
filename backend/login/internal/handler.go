@@ -36,42 +36,41 @@ func checkUser(n string, p string) (*db.User, error) {
 
 func handleSignup(args []interface{}) {
 	var m *msg.Signup
-	a, t := util.GetArgs(args, &m)
+	a := util.GetArgs(args, &m)
 
 	if !util.RequireParam(m.UserName, m.UserPass) {
-		msg.Send400(a, t)
 		return
 	}
 
 	ret, err := checkUser(m.UserName, "")
 	if err != nil {
-		msg.Send500(a, t, err)
+		msg.Send(a, &msg.SignupRsp{Status: 2})
 		return
 	} else if ret != nil {
-		msg.Send200(a, t, &msg.SignupRsp{Status: 1})
+		msg.Send(a, &msg.SignupRsp{Status: 1})
 		return
 	}
 
-	db.RDBClient.Create(&db.User{UserName: m.UserName, UserPass: util.HashPwd(m.UserPass)})
-	msg.Send200(a, t, &msg.SignupRsp{Status: 0})
-	log.Release("user sign up \"%s\"", m.UserName)
+	usr := db.User{UserName: m.UserName, UserPass: util.HashPwd(m.UserPass)}
+	db.RDBClient.Create(&usr)
+	msg.Send(a, &msg.SignupRsp{Status: 0})
+	log.Release("User [%v] sign up", usr.ID)
 }
 
 func handleLogin(args []interface{}) {
 	var m *msg.Login
-	a, t := util.GetArgs(args, &m)
+	a := util.GetArgs(args, &m)
 
 	if !util.RequireParam(m.UserName, m.UserPass) {
-		msg.Send400(a, t)
 		return
 	}
 
 	ret, err := checkUser(m.UserName, m.UserPass)
 	if err != nil {
-		msg.Send500(a, t, err)
+		msg.Send(a, &msg.LoginRsp{Status: 2})
 		return
 	} else if ret == nil {
-		msg.Send200(a, t, &msg.LoginRsp{Status: 1})
+		msg.Send(a, &msg.LoginRsp{Status: 1})
 		return
 	}
 
@@ -81,10 +80,10 @@ func handleLogin(args []interface{}) {
 		"Name": ret.UserName,
 	})
 	db.RSClient.Expire(token, 1*time.Hour)
-	msg.Send200(a, t, &msg.LoginRsp{
+	msg.Send(a, &msg.LoginRsp{
 		Status: 0,
 		ID:     ret.ID,
 		Token:  token,
 	})
-	log.Release("user login \"%s\"", m.UserName)
+	log.Release("User [%v] login", ret.ID)
 }

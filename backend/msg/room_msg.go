@@ -13,12 +13,12 @@ func RoomMsgInit() {
  * @apiName GetRooms
  * @apiDescription Get room info
  *
- * @apiParam {int32} Offset=0 room amount offset
- * @apiParam {int32{1-100}} Limit=20 amount limit
+ * @apiParam {int} Offset=0 room amount offset
+ * @apiParam {int{1-20}} Limit=20 amount limit
  */
 type GetRooms struct {
-	Offset int32
-	Limit  int32
+	Offset int
+	Limit  int
 }
 
 /**
@@ -29,9 +29,11 @@ type GetRooms struct {
  * @apiName GetRoomsRsp
  * @apiDescription Get room info rsp
  *
+ * @apiParam {int} Total total room number
  * @apiParam {list} RoomInfo Room info, see [NewRoomRsp](#api-Room-NewRoomRsp)
  */
 type GetRoomsRsp struct {
+	Total    int
 	RoomInfo []RoomInfo
 }
 
@@ -44,11 +46,11 @@ type GetRoomsRsp struct {
  * @apiDescription New room
  *
  * @apiParam {string} Name room name
- * @apiParam {int32} Type room type
+ * @apiParam {int} Type room type
  */
 type NewRoom struct {
 	Name string
-	Type int32
+	Type int
 }
 
 /**
@@ -59,28 +61,29 @@ type NewRoom struct {
  * @apiName NewRoomRsp
  * @apiDescription New room response
  *
- * @apiParam {int32} ID Room id
+ * @apiParam {int} ID Room id
  * @apiParam {string} Name Room name
- * @apiParam {int32} Type Room type <br> 0 for solo
- * @apiParam {int32} Size Room size
- * @apiParam {int32} Capacity Room capacity
- * @apiParam {int32} Master Room master
- * @apiParam {int32} Status Room status <br> 0 for gaming <br> 1 for waiting
+ * @apiParam {int} Type Room type <br> 1 for solo
+ * @apiParam {int} Size Room size
+ * @apiParam {int} Capacity Room capacity
+ * @apiParam {int} Master Room master
+ * @apiParam {int} Status Room status <br> 0 for waiting <br> 1 for gaming
  */
 type NewRoomRsp RoomInfo
 
-type RoomType int32
+type RoomType int
 
 const (
-	Room_Solo RoomType = 0
+	Room_Solo RoomType = 1
 )
 
 type RoomInfo struct {
-	ID       int32
+	ID       int
 	Name     string
 	Type     RoomType
-	Size     int32
-	Capacity int32
-	Master   int32
-	Status   int32
+	Size     int
+	Capacity int
+	Master   int
+	Status   int
+	Members  []int `json:"-"`
 }

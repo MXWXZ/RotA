@@ -3,10 +3,7 @@ package util
 import (
 	"bytes"
 	"fmt"
-	"reflect"
-
-	"github.com/name5566/leaf/gate"
-	"github.com/name5566/leaf/module"
+	"runtime"
 )
 
 // IsEmpty check param zero value
@@ -44,12 +41,9 @@ func RequireParam(v ...interface{}) bool {
 	return true
 }
 
-func GetArgs(args []interface{}, m interface{}) (gate.Agent, string) {
-	v := reflect.ValueOf(m)
-	v.Elem().Set(reflect.ValueOf(args[0]))
-	return args[1].(gate.Agent), v.Elem().Type().String()[5:]
-}
-
-func Handler(s *module.Skeleton, m interface{}, h interface{}) {
-	s.RegisterChanRPC(reflect.TypeOf(m), h)
+func GetFuncName() string {
+	pc := make([]uintptr, 1)
+	runtime.Callers(2, pc)
+	f := runtime.FuncForPC(pc[0])
+	return f.Name()
 }

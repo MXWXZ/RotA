@@ -4,6 +4,7 @@ func LoginMsgInit() {
 	Processor.Register(&Login{})
 	Processor.Register(&Signup{})
 	Processor.Register(&CheckToken{})
+	Processor.Register(&NeedTokenRsp{})
 }
 
 /**
@@ -16,11 +17,9 @@ func LoginMsgInit() {
  *
  * @apiParam {string} UserName user name
  * @apiParam {string} UserPass user password
- * @apiSuccess {int32} Status 0 for success, 1 for invalid
- * @apiSuccess {int32} ID user id
+ * @apiSuccess {int} Status 0 for success, 1 for invalid, 2 for server error
+ * @apiSuccess {int} ID user id
  * @apiSuccess {string} Token 64 length token for success
- * @apiUse InvalidParam
- * @apiUse ServerError
  */
 type Login struct {
 	UserName string
@@ -28,8 +27,8 @@ type Login struct {
 }
 
 type LoginRsp struct {
-	Status int32
-	ID     int32
+	Status int
+	ID     int
 	Token  string
 }
 
@@ -43,9 +42,7 @@ type LoginRsp struct {
  *
  * @apiParam {string} UserName user name
  * @apiParam {string} UserPass user password
- * @apiSuccess {int32} Status 0 for success, 1 for exist
- * @apiUse InvalidParam
- * @apiUse ServerError
+ * @apiSuccess {int} Status 0 for success, 1 for exist, 2 for server error
  */
 type Signup struct {
 	UserName string
@@ -53,7 +50,7 @@ type Signup struct {
 }
 
 type SignupRsp struct {
-	Status int32
+	Status int
 }
 
 /**
@@ -64,17 +61,34 @@ type SignupRsp struct {
  * @apiName CheckToken
  * @apiDescription Check user token
  *
- * @apiParam {int32} ID user id
+ * @apiParam {int} ID user id
  * @apiParam {string} Token 64 length token
- * @apiSuccess {int32} Status 0 for success, 1 for invalid
- * @apiUse InvalidParam
- * @apiUse ServerError
+ * @apiSuccess {int} Code 0 for success, 1 for invalid
+ * @apiSuccess {int} ID user id
+ * @apiSuccess {string} Name user name
+ * @apiSuccess {int} Room user room
+ * @apiSuccess {int} Status user status
  */
 type CheckToken struct {
-	ID    int32
+	ID    int
 	Token string
 }
 
 type CheckTokenRsp struct {
-	Status int32
+	Code   int
+	ID     int
+	Name   string
+	Room   int
+	Status int
+}
+
+/**
+ * @api {WS} NeedTokenRsp NeedTokenRsp
+ * @apiVersion 1.0.0
+ * @apiGroup User
+ * @apiPermission server
+ * @apiName NeedTokenRsp
+ * @apiDescription Ask client to check token
+ */
+type NeedTokenRsp struct {
 }
