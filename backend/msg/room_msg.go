@@ -87,3 +87,29 @@ type RoomInfo struct {
 	Status   int
 	Members  []int `json:"-"`
 }
+
+/**
+ * @api {WS} DeleteRoomRsp DeleteRoomRsp
+ * @apiVersion 1.0.0
+ * @apiGroup Room
+ * @apiPermission server
+ * @apiName DeleteRoomRsp
+ * @apiDescription Delete room
+ *
+ * @apiParam {int} ID room id
+ */
+type DeleteRoomRsp struct {
+	ID int
+}
+
+/**
+ * @api {WS} RoomInfoRsp RoomInfoRsp
+ * @apiVersion 1.0.0
+ * @apiGroup Room
+ * @apiPermission server
+ * @apiName RoomInfoRsp
+ * @apiDescription Room current info
+ *
+ * @apiParam {-} - see [NewRoomRsp](#api-Room-NewRoomRsp)
+ */
+type RoomInfoRsp RoomInfo

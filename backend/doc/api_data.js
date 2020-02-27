@@ -1,6 +1,35 @@
 define({ "api": [
   {
     "type": "WS",
+    "url": "DeleteRoomRsp",
+    "title": "DeleteRoomRsp",
+    "version": "1.0.0",
+    "group": "Room",
+    "permission": [
+      {
+        "name": "server"
+      }
+    ],
+    "name": "DeleteRoomRsp",
+    "description": "<p>Delete room</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "int",
+            "optional": false,
+            "field": "ID",
+            "description": "<p>room id</p>"
+          }
+        ]
+      }
+    },
+    "filename": "msg/room_msg.go",
+    "groupTitle": "Room"
+  },
+  {
+    "type": "WS",
     "url": "GetRooms",
     "title": "GetRooms",
     "version": "1.0.0",
@@ -174,6 +203,35 @@ define({ "api": [
             "optional": false,
             "field": "Status",
             "description": "<p>Room status <br> 0 for waiting <br> 1 for gaming</p>"
+          }
+        ]
+      }
+    },
+    "filename": "msg/room_msg.go",
+    "groupTitle": "Room"
+  },
+  {
+    "type": "WS",
+    "url": "RoomInfoRsp",
+    "title": "RoomInfoRsp",
+    "version": "1.0.0",
+    "group": "Room",
+    "permission": [
+      {
+        "name": "server"
+      }
+    ],
+    "name": "RoomInfoRsp",
+    "description": "<p>Room current info</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "<ul> <li></li> </ul>",
+            "optional": false,
+            "field": "-",
+            "description": "<p>see <a href=\"#api-Room-NewRoomRsp\">NewRoomRsp</a></p>"
           }
         ]
       }

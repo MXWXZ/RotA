@@ -62,6 +62,11 @@ class Login extends Component {
         });
     }
 
+    componentWillUnmount() {
+        Server.DeleteHandler("LoginRsp");
+        Server.DeleteHandler("SignupRsp");
+    }
+
     render() {
         const { getFieldDecorator } = this.props.form;
         const isLogged = sessionStorage.getItem("id") != null &&

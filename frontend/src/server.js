@@ -36,6 +36,10 @@ class Server {
         evt[n] = h;
     }
 
+    static DeleteHandler(n) {
+        delete evt[n];
+    }
+
     static handler(data) {
         var reader = new FileReader();
         reader.onload = (e) => {
@@ -60,6 +64,10 @@ Server.AddHandler("NeedTokenRsp", () => {
     Server.CheckToken(() => {
         message.success("重新连接成功");
     });
+    return true;
+});
+Server.AddHandler("Error", (d) => {
+    message.error(d.Msg.Info);
     return true;
 });
 

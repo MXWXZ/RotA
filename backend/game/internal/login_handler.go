@@ -24,7 +24,7 @@ func handleCheckToken(args []interface{}) {
 
 	res, err := db.RSClient.HMGet(m.Token, "ID", "Name").Result()
 	if err != nil || res[0] == nil || res[1] == nil || strconv.Itoa(int(m.ID)) != res[0].(string) {
-		agents[a].Reset()
+		agents[a] = nil
 		log.Error("User [%v] token invalid", m.ID)
 		msg.Send(a, &msg.CheckTokenRsp{Code: 1})
 		return
@@ -34,10 +34,24 @@ func handleCheckToken(args []interface{}) {
 	id, err := strconv.Atoi(res[0].(string))
 	if err != nil {
 		log.Error("%v", err)
+		msg.SendError(a, "Login server error")
 	}
 
-	agents[a].ID = id
-	agents[a].Name = res[1].(string)
+	if _, ok := users[id]; !ok { // not login before
+		users[id] = &User{
+			ID:     id,
+			Name:   res[1].(string),
+			Room:   0,
+			Status: 0,
+		}
+	}
+	if users[id].Token != m.Token && users[id].Token != "" { // former token exist
+		db.RSClient.Del(users[id].Token)
+		delete(agents, users[id].Agent)
+	}
+	users[id].Agent = a
+	users[id].Token = m.Token
+	agents[a] = users[id]
 	msg.Send(a, &msg.CheckTokenRsp{
 		Code:   0,
 		ID:     agents[a].ID,

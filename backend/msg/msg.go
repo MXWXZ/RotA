@@ -19,7 +19,15 @@ func Send(a gate.Agent, m interface{}) {
 	a.WriteMsg(&Response{Type: reflect.ValueOf(m).Elem().Type().String()[4:], Msg: m})
 }
 
+func SendError(a gate.Agent, s string) {
+	a.WriteMsg(&Response{Type: "Error", Msg: &Error{Info: s}})
+}
+
 type Response struct {
 	Type string
 	Msg  interface{}
+}
+
+type Error struct {
+	Info string
 }

@@ -113,16 +113,44 @@ class RoomForm extends Component {
         })
     }
 
+    componentWillUnmount() {
+        Server.DeleteHandler("NewRoomRsp");
+        Server.DeleteHandler("DeleteRoomRsp");
+        Server.DeleteHandler("RoomInfoRsp");
+        Server.DeleteHandler("GetRoomsRsp");
+    }
+
     componentDidMount() {
         Server.AddHandler("NewRoomRsp", (d) => {
             this.setState({ data: this.state.data.concat(d.Msg) })
             return true;
         });
+        Server.AddHandler("DeleteRoomRsp", (d) => {
+            let newdata = this.state.data;
+            for (let i = 0, len = newdata.length; i < len; ++i) {
+                if (newdata[i].ID === d.Msg.ID) {
+                    newdata.splice(i, 1);
+                    break;
+                }
+            }
+            this.setState({ data: newdata });
+            return true;
+        });
+        Server.AddHandler("RoomInfoRsp", (d) => {
+            let newdata = this.state.data;
+            for (let i = 0, len = newdata.length; i < len; ++i) {
+                if (newdata[i].ID === d.Msg.ID) {
+                    newdata[i] = d.Msg
+                    break;
+                }
+            }
+            this.setState({ data: newdata });
+            return true;
+        });
         Server.AddHandler("GetRoomsRsp", (d) => {
             this.setState({ data: d.Msg.RoomInfo })
         });
-        Server.Send("GetRooms", {
-        });
+        Server.Send("GetRooms", {});
     }
 
     render() {
