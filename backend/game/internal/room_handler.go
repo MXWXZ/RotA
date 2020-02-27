@@ -11,10 +11,44 @@ import (
 func init() {
 	util.Handler(Skeleton, &msg.GetRooms{}, checkUser(handleGetRooms))
 	util.Handler(Skeleton, &msg.NewRoom{}, checkUser(handleNewRoom))
+	util.Handler(Skeleton, &msg.JoinRoom{}, checkUser(handleJoinRoom))
 }
 
 var nowID = 1
 var rooms []msg.RoomInfo
+
+func handleJoinRoom(args []interface{}) {
+	var m *msg.JoinRoom
+	a := util.GetArgs(args, &m)
+
+	if !util.RequireParam(m.ID) {
+		log.Error("User [%v] missing param in %v", agents[a].ID, util.GetFuncName())
+		return
+	}
+
+	if agents[a].Room != 0 { // already in room
+		log.Error("User [%v] join room invalid", agents[a].ID)
+		msg.SendError(a, "加入失败，你已经在一个房间中了")
+		return
+	}
+
+	for i, v := range rooms {
+		if v.ID == m.ID {
+			if v.Capacity-v.Size > 0 { // not full
+				rooms[i].Size += 1
+				rooms[i].Members = append(rooms[i].Members, agents[a].ID)
+				agents[a].Room = v.ID
+				var tmp = msg.RoomInfoRsp(rooms[i])
+				broadCastRoom(v.ID, &tmp)
+				broadCastRoom(0, &tmp)
+				log.Release("User [%v] join room [%v]", agents[a].ID, v.ID)
+			} else {
+				msg.SendError(a, "房间已满")
+			}
+			break
+		}
+	}
+}
 
 func handleNewRoom(args []interface{}) {
 	var m *msg.NewRoom
@@ -51,7 +85,8 @@ func handleNewRoom(args []interface{}) {
 	agents[a].Room = info.ID
 
 	var tmp = msg.NewRoomRsp(info)
-	broadCast(&tmp)
+	broadCastRoom(0, &tmp)
+	msg.Send(a, &tmp)
 	log.Release("User [%v] create room", agents[a].ID)
 }
 
@@ -82,6 +117,7 @@ func handleGetRooms(args []interface{}) {
 		Total:    len(rooms),
 		RoomInfo: rooms[m.Offset : m.Offset+m.Limit],
 	})
+	log.Release("User [%v] get rooms", agents[a].ID)
 }
 
 func exitRoom(a gate.Agent) {
@@ -91,9 +127,9 @@ func exitRoom(a gate.Agent) {
 
 	rid := agents[a].Room
 	uid := agents[a].ID
+	agents[a].Room = 0
 	for i, v := range rooms {
 		if v.ID == rid {
-			agents[a].Room = 0
 			if v.Size == 1 { // only one, delete room
 				rooms = append(rooms[:i], rooms[i+1:]...)
 				broadCastRoom(0, &msg.DeleteRoomRsp{ID: rid})
@@ -111,6 +147,8 @@ func exitRoom(a gate.Agent) {
 				broadCastRoom(0, &tmp)
 				broadCastRoom(rid, &tmp)
 			}
+			break
 		}
 	}
+	log.Release("User [%v] exit room [%v]", agents[a].ID, rid)
 }

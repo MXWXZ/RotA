@@ -61,9 +61,11 @@ const columns = [
         width: 100,
         align: 'center',
         sorter: (a, b) => a.Status - b.Status,
-        render: status => {
+        render: (status, record) => {
             if (status)
                 return <font color="grey">游戏中</font>
+            else if (record.Size === record.Capacity)
+                return <font color="grey">已满</font>
             else
                 return <font color="green">可加入</font>
         }
@@ -74,7 +76,7 @@ const columns = [
         width: 100,
         align: 'center',
         render: (_, record) => {
-            if (record.Status)
+            if (record.Status || record.Size === record.Capacity)
                 return <Link to={'/room/' + record.ID.toString()} disabled>加入</Link>
             else
                 return <Link to={'/room/' + record.ID.toString()}>加入</Link>

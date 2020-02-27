@@ -13,4 +13,5 @@ func init() {
 	msg.Processor.SetRouter(&msg.CheckToken{}, game.ChanRPC)
 	msg.Processor.SetRouter(&msg.GetRooms{}, game.ChanRPC)
 	msg.Processor.SetRouter(&msg.NewRoom{}, game.ChanRPC)
+	msg.Processor.SetRouter(&msg.JoinRoom{}, game.ChanRPC)
 }

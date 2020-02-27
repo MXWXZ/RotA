@@ -3,6 +3,7 @@ package msg
 func RoomMsgInit() {
 	Processor.Register(&GetRooms{})
 	Processor.Register(&NewRoom{})
+	Processor.Register(&JoinRoom{})
 }
 
 /**
@@ -85,7 +86,7 @@ type RoomInfo struct {
 	Capacity int
 	Master   int
 	Status   int
-	Members  []int `json:"-"`
+	Members  []int
 }
 
 /**
@@ -99,6 +100,20 @@ type RoomInfo struct {
  * @apiParam {int} ID room id
  */
 type DeleteRoomRsp struct {
+	ID int
+}
+
+/**
+ * @api {WS} JoinRoom JoinRoom
+ * @apiVersion 1.0.0
+ * @apiGroup Room
+ * @apiPermission client
+ * @apiName JoinRoom
+ * @apiDescription Join room
+ *
+ * @apiParam {int} ID room id
+ */
+type JoinRoom struct {
 	ID int
 }
 
