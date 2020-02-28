@@ -36,7 +36,20 @@ func handleJoinRoom(args []interface{}) {
 		if v.ID == m.ID {
 			if v.Capacity-v.Size > 0 { // not full
 				rooms[i].Size += 1
-				rooms[i].Members = append(rooms[i].Members, agents[a].ID)
+				cnt := util.SumSlice(rooms[i].Members)
+				member := msg.RoomMember{
+					ID:   agents[a].ID,
+					Name: agents[a].Name,
+					Team: 0,
+				}
+				if rooms[i].Type == msg.Room_Solo {
+					if cnt[1] == 1 {
+						member.Team = 2
+					} else {
+						member.Team = 1
+					}
+				}
+				rooms[i].Members = append(rooms[i].Members, member)
 				agents[a].Room = v.ID
 				var tmp = msg.RoomInfoRsp(rooms[i])
 				broadCastRoom(v.ID, &tmp)
@@ -78,7 +91,11 @@ func handleNewRoom(args []interface{}) {
 		Capacity: rc,
 		Master:   agents[a].ID,
 		Status:   0,
-		Members:  []int{agents[a].ID},
+		Members: []msg.RoomMember{{
+			ID:   agents[a].ID,
+			Name: agents[a].Name,
+			Team: 1,
+		}},
 	}
 	rooms = append(rooms, info)
 	nowID += 1
@@ -135,13 +152,13 @@ func exitRoom(a gate.Agent) {
 				broadCastRoom(0, &msg.DeleteRoomRsp{ID: rid})
 			} else { // have other people
 				for ri, rm := range rooms[i].Members {
-					if rm == uid {
+					if rm.ID == uid {
 						rooms[i].Members = append(rooms[i].Members[:ri], rooms[i].Members[ri+1:]...)
 					}
 				}
 				rooms[i].Size -= 1
 				if rooms[i].Master == uid { // new master
-					rooms[i].Master = rooms[i].Members[0]
+					rooms[i].Master = rooms[i].Members[0].ID
 				}
 				var tmp = msg.RoomInfoRsp(rooms[i])
 				broadCastRoom(0, &tmp)

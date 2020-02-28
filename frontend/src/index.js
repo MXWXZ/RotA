@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import LoginForm from './login';
 import Room from './room';
+import Inroom from './inroom';
 import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 import Server from './server';
 import { Spin, ConfigProvider } from 'antd';
@@ -40,6 +41,7 @@ const RotaRouter = (
         <Router>
             <Route exact path='/' component={LoginForm} />
             <Route exact path='/room' render={(props) => <AuthRoute {...props} component={Room} />} />
+            <Route exact path='/room/:rid' component={Inroom} />
         </Router>
     </ConfigProvider>
 );

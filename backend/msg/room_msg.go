@@ -69,6 +69,10 @@ type NewRoom struct {
  * @apiParam {int} Capacity Room capacity
  * @apiParam {int} Master Room master
  * @apiParam {int} Status Room status <br> 0 for waiting <br> 1 for gaming
+ * @apiParam {RoomMember} Member Room member
+ * @apiParam (RoomMember) {int} ID Member ID
+ * @apiParam (RoomMember) {string} Name Member name
+ * @apiParam (RoomMember) {int} Team Member team
  */
 type NewRoomRsp RoomInfo
 
@@ -86,7 +90,13 @@ type RoomInfo struct {
 	Capacity int
 	Master   int
 	Status   int
-	Members  []int
+	Members  []RoomMember
+}
+
+type RoomMember struct {
+	ID   int
+	Name string
+	Team int
 }
 
 /**
