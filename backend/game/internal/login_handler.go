@@ -47,6 +47,8 @@ func handleCheckToken(args []interface{}) {
 	}
 	if users[id].Token != m.Token && users[id].Token != "" { // former token exist
 		db.RSClient.Del(users[id].Token)
+		msg.Send(users[id].Agent, &msg.NeedTokenRsp{})
+		exitRoom(users[id].Agent) // try to logout former user
 		delete(agents, users[id].Agent)
 	}
 	users[id].Agent = a

@@ -9,6 +9,8 @@ import { SetID, SetStorage } from '../../storage'
 // span: Wrap span
 // offset: Wrap offset
 class LoginForm extends Component {
+    form = React.createRef();
+
     state = {
         loading: false,
     }
@@ -31,20 +33,23 @@ class LoginForm extends Component {
         Server.Send('Login', v);
     }
 
-    handleSignup = (v) => {
-        this.setState({ loading: true });
-        Server.AddHandler('SignupRsp', (data) => {
-            if (data.Msg.Status === 1) {
-                message.error('用户名已存在');
-                this.setState({ loading: false });
-            } else if (data.Msg.Status === 2) {
-                message.error('服务器错误');
-                this.setState({ loading: false });
-            } else {
-                message.success('注册成功', 1).then(() => this.props.onSignup());
-            }
-        });
-        Server.Send('Signup', v);
+    handleSignup = async () => {
+        try {
+            const v = await this.form.current.validateFields();
+            this.setState({ loading: true });
+            Server.AddHandler('SignupRsp', (data) => {
+                if (data.Msg.Status === 1) {
+                    message.error('用户名已存在');
+                    this.setState({ loading: false });
+                } else if (data.Msg.Status === 2) {
+                    message.error('服务器错误');
+                    this.setState({ loading: false });
+                } else {
+                    message.success('注册成功', 1).then(() => this.props.onSignup());
+                }
+            });
+            Server.Send('Signup', v);
+        } catch (errorInfo) { }
     }
 
     componentWillUnmount() {
@@ -54,7 +59,7 @@ class LoginForm extends Component {
 
     render() {
         return (
-            <Form wrapperCol={{ span: this.props.span, offset: this.props.offset }} onFinish={this.handleLogin}>
+            <Form ref={this.form} wrapperCol={{ span: this.props.span, offset: this.props.offset }} onFinish={this.handleLogin}>
                 <Form.Item name='UserName' rules={[
                     {
                         required: true,

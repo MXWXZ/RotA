@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
-import { EnterOutlined } from '@ant-design/icons'
-import { Card, Row, Col, Input, message } from 'antd'
+import { Row, Col, message } from 'antd'
 import InroomTeam from '../component/inroom/inroom_team'
 import InroomReady from '../component/inroom/inroom_ready'
 import InroomInfo from '../component/inroom/inroom_info'
@@ -8,8 +7,8 @@ import UtilLoading from '../component/util/util_loading'
 import Server from '../server'
 import { Redirect } from 'react-router-dom'
 import { GetID } from '../storage'
-
-const { Search } = Input;
+import ChatBox from '../component/chat/chat_box'
+import ChatInput from '../component/chat/chat_input'
 
 class Inroom extends Component {
     state = {
@@ -17,16 +16,20 @@ class Inroom extends Component {
         loaded: false,
         disabled: true,
         data: {},
+        cteam: 0,
         team: [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []],
     }
 
     update = (d) => {
         this.setState({ data: d });
         let newteam = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []];
-        for (let i = 0, len = this.state.data.Members.length; i < len; ++i)
+        for (let i = 0, len = this.state.data.Members.length; i < len; ++i) {
+            if (this.state.data.Members[i].ID === GetID())
+                this.setState({ cteam: this.state.data.Members[i].Team });
             newteam[this.state.data.Members[i].Team].push([this.state.data.Members[i].Name,
             this.state.data.Members[i].ID === this.state.data.Master,
             this.state.data.Members[i].Ready]);
+        }
         let block = true;
         if (this.state.data.Master === GetID()) {
             if (this.state.data.Capacity === this.state.data.Size) {
@@ -82,8 +85,8 @@ class Inroom extends Component {
             case 1:
                 room = (
                     <Col span={12}>
-                        <InroomTeam name='近卫' data={this.state.team[1]} capacity={1} />
-                        <InroomTeam name='天灾' data={this.state.team[2]} capacity={1} />
+                        <InroomTeam name='近卫' data={this.state.team[1]} capacity={1} team={1} changable={this.state.cteam !== 1} />
+                        <InroomTeam name='天灾' data={this.state.team[2]} capacity={1} team={2} changable={this.state.cteam !== 2} />
                     </Col>
                 )
                 break;
@@ -102,12 +105,10 @@ class Inroom extends Component {
                         {room}
                         <Col span={10} offset={1}>
                             <InroomReady type={this.state.data.Master === GetID() ? 2 : 1} disabled={this.state.disabled} />
-                            <Card style={{ marginTop: '15px', marginBottom: '15px', height: 300, overflowY: 'scroll' }}>
-                                <p>A: Card content</p>
-                                <p>A: Card content</p><p>A: Card content</p><p>A: Card content</p><p>A: Card content</p><p>A: Card content</p><p>A: Card content</p>
-                                <p>A: Card content</p><p>B: Card content</p>
-                            </Card>
-                            <Search placeholder='input search text' onSearch={value => console.log(value)} enterButton={<EnterOutlined />} />
+                            <div style={{ marginTop: '15px', marginBottom: '15px', height: 300 }} >
+                                <ChatBox />
+                            </div>
+                            <ChatInput />
                         </Col>
                     </Row>
 

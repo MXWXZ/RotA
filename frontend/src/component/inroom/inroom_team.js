@@ -1,6 +1,7 @@
 import React from 'react'
 import { Button, List } from 'antd'
 import { StarTwoTone, CheckCircleTwoTone } from '@ant-design/icons'
+import Server from '../../server'
 
 function expandData(d, c) {
     while (d.length < c)
@@ -24,13 +25,22 @@ function renderItem(item) {
     )
 }
 
+function changeTeam(id) {
+    Server.Send('ChangeTeam', {
+        Team: id,
+    })
+}
+
 // name: team name
 // data: data source
 // capacity: team capacity
+// team: teamid
+// changable: true to show change
 function InroomTeam(props) {
     return (
-        <List header={<div>{props.name}</div>} itemLayout="vertical" dataSource={expandData(props.data, props.capacity)}
-            renderItem={item => renderItem(item)}
+        <List header={<div>{props.name} {props.changable ?
+            <Button style={{ float: "right" }} size="small" onClick={() => { changeTeam(props.team) }}>加入阵营</Button> : ''}</div>}
+            itemLayout="vertical" dataSource={expandData(props.data, props.capacity)} renderItem={item => renderItem(item)}
         />
     )
 }

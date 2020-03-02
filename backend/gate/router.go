@@ -16,4 +16,6 @@ func init() {
 	msg.Processor.SetRouter(&msg.JoinRoom{}, game.ChanRPC)
 	msg.Processor.SetRouter(&msg.ReadyRoom{}, game.ChanRPC)
 	msg.Processor.SetRouter(&msg.ExitRoom{}, game.ChanRPC)
+	msg.Processor.SetRouter(&msg.ChangeTeam{}, game.ChanRPC)
+	msg.Processor.SetRouter(&msg.Chat{}, game.ChanRPC)
 }

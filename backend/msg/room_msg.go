@@ -6,6 +6,7 @@ func RoomMsgInit() {
 	Processor.Register(&JoinRoom{})
 	Processor.Register(&ReadyRoom{})
 	Processor.Register(&ExitRoom{})
+	Processor.Register(&ChangeTeam{})
 }
 
 /**
@@ -183,3 +184,17 @@ type ExitRoom struct {
  * @apiParam {-} - see [NewRoomRsp](#api-Room-NewRoomRsp)
  */
 type RoomInfoRsp RoomInfo
+
+/**
+ * @api {WS} ChangeTeam ChangeTeam
+ * @apiVersion 1.0.0
+ * @apiGroup Room
+ * @apiPermission client
+ * @apiName ChangeTeam
+ * @apiDescription Change player team
+ *
+ * @apiParam {int} Team new team
+ */
+type ChangeTeam struct {
+	Team int
+}

@@ -55,7 +55,7 @@ class Server {
     static Send(n, d) {
         var msg = {};
         msg[n] = d;
-
+        con
         ws.send(JSON.stringify(msg));
     }
 }
