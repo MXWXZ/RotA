@@ -36,6 +36,9 @@ func broadCast(m interface{}) {
 
 func broadCastRoom(r int, m interface{}) {
 	for i, v := range agents {
+		if v == nil {
+			continue
+		}
 		if v.Room == r {
 			msg.Send(i, m)
 		}

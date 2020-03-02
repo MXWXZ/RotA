@@ -12,10 +12,60 @@ func init() {
 	util.Handler(Skeleton, &msg.GetRooms{}, checkUser(handleGetRooms))
 	util.Handler(Skeleton, &msg.NewRoom{}, checkUser(handleNewRoom))
 	util.Handler(Skeleton, &msg.JoinRoom{}, checkUser(handleJoinRoom))
+	util.Handler(Skeleton, &msg.ReadyRoom{}, checkUser(handleReadyRoom))
+	util.Handler(Skeleton, &msg.ExitRoom{}, checkUser(handleExitRoom))
 }
 
 var nowID = 1
 var rooms []msg.RoomInfo
+
+func handleExitRoom(args []interface{}) {
+	var m *msg.ExitRoom
+	a := util.GetArgs(args, &m)
+
+	exitRoom(a)
+}
+
+func handleReadyRoom(args []interface{}) {
+	var m *msg.ReadyRoom
+	a := util.GetArgs(args, &m)
+
+	if m.Ready != 0 && m.Ready != 1 {
+		log.Error("User [%v] invalid param in %v", agents[a].ID, util.GetFuncName())
+		return
+	}
+
+	if agents[a].Room == 0 { // not in room
+		log.Error("User [%v] invalid ready", agents[a].ID)
+		msg.SendError(a, "准备失败，你不在任何一个房间中")
+		return
+	}
+
+	if agents[a].Status == 1 { // started
+		log.Error("User [%v] invalid ready", agents[a].ID)
+		msg.SendError(a, "准备失败，游戏已经开始")
+		return
+	}
+
+	for i, v := range rooms {
+		if v.ID == agents[a].Room {
+			if v.Master == agents[a].ID { // master cant ready
+				log.Error("User [%v] master invalid ready", agents[a].ID)
+				msg.SendError(a, "准备失败，你现在是房主")
+				return
+			}
+			for j, k := range rooms[i].Members {
+				if k.ID == agents[a].ID {
+					rooms[i].Members[j].Ready = m.Ready
+					var tmp = msg.RoomInfoRsp(rooms[i])
+					broadCastRoom(v.ID, &tmp)
+				}
+			}
+			break
+		}
+	}
+	log.Release("User [%v] get ready %v", agents[a].ID, m.Ready)
+}
 
 func handleJoinRoom(args []interface{}) {
 	var m *msg.JoinRoom
@@ -26,14 +76,18 @@ func handleJoinRoom(args []interface{}) {
 		return
 	}
 
-	if agents[a].Room != 0 { // already in room
+	if agents[a].Room != 0 && agents[a].Room != m.ID { // master will join after create, Room will be set in create
 		log.Error("User [%v] join room invalid", agents[a].ID)
-		msg.SendError(a, "加入失败，你已经在一个房间中了")
+		msg.Send(a, &msg.JoinRoomRsp{Code: 2})
 		return
 	}
 
 	for i, v := range rooms {
 		if v.ID == m.ID {
+			if agents[a].Room == m.ID { // already in just send info
+				msg.Send(a, &msg.JoinRoomRsp{Code: 0, Info: rooms[i]})
+				return
+			}
 			if v.Capacity-v.Size > 0 { // not full
 				rooms[i].Size += 1
 				cnt := util.SumSlice(rooms[i].Members)
@@ -50,17 +104,19 @@ func handleJoinRoom(args []interface{}) {
 					}
 				}
 				rooms[i].Members = append(rooms[i].Members, member)
-				agents[a].Room = v.ID
 				var tmp = msg.RoomInfoRsp(rooms[i])
 				broadCastRoom(v.ID, &tmp)
 				broadCastRoom(0, &tmp)
+				agents[a].Room = v.ID
+				msg.Send(a, &msg.JoinRoomRsp{Code: 0, Info: rooms[i]})
 				log.Release("User [%v] join room [%v]", agents[a].ID, v.ID)
 			} else {
-				msg.SendError(a, "房间已满")
+				msg.Send(a, &msg.JoinRoomRsp{Code: 1})
 			}
-			break
+			return
 		}
 	}
+	msg.Send(a, &msg.JoinRoomRsp{Code: 3})
 }
 
 func handleNewRoom(args []interface{}) {

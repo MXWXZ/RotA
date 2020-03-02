@@ -1,5 +1,6 @@
-import ReconnectingWebSocket from 'reconnecting-websocket';
-import { message } from 'antd';
+import ReconnectingWebSocket from 'reconnecting-websocket'
+import { message } from 'antd'
+import { GetID, SetStorage, GetStorage, Clear } from './storage'
 
 var ws = new ReconnectingWebSocket(process.env.REACT_APP_BACKEND);
 var evt = {};
@@ -11,21 +12,21 @@ class Server {
             Server.AddHandler("CheckTokenRsp", (data) => {
                 if (data.Msg.Code === 1) {
                     message.error("凭据已过期，请重新登录");
-                    sessionStorage.clear();
+                    Clear();
                     setTimeout(() => {
                         window.location.href = "/"
                     }, 1000);
                 } else {
-                    sessionStorage.setItem('name', data.Msg.Name);
-                    sessionStorage.setItem('room', data.Msg.Room);
-                    sessionStorage.setItem('status', data.Msg.Status);
+                    SetStorage('Name', data.Msg.Name);
+                    SetStorage('Room', data.Msg.Room);
+                    SetStorage('Status', data.Msg.Status);
                     checked = true;
                     cb();
                 }
             });
             Server.Send("CheckToken", {
-                ID: parseInt(sessionStorage.getItem('id')),
-                Token: sessionStorage.getItem('token'),
+                ID: GetID(),
+                Token: GetStorage('Token'),
             });
         } else {
             cb();
@@ -61,6 +62,7 @@ class Server {
 
 ws.addEventListener('message', Server.handler);
 Server.AddHandler("NeedTokenRsp", () => {
+    checked = false;
     Server.CheckToken(() => {
         message.success("重新连接成功");
     });

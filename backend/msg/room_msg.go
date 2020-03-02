@@ -4,6 +4,8 @@ func RoomMsgInit() {
 	Processor.Register(&GetRooms{})
 	Processor.Register(&NewRoom{})
 	Processor.Register(&JoinRoom{})
+	Processor.Register(&ReadyRoom{})
+	Processor.Register(&ExitRoom{})
 }
 
 /**
@@ -73,6 +75,7 @@ type NewRoom struct {
  * @apiParam (RoomMember) {int} ID Member ID
  * @apiParam (RoomMember) {string} Name Member name
  * @apiParam (RoomMember) {int} Team Member team
+ * @apiParam (RoomMember) {int} Ready 1 for ready
  */
 type NewRoomRsp RoomInfo
 
@@ -94,9 +97,10 @@ type RoomInfo struct {
 }
 
 type RoomMember struct {
-	ID   int
-	Name string
-	Team int
+	ID    int
+	Name  string
+	Team  int
+	Ready int
 }
 
 /**
@@ -125,6 +129,47 @@ type DeleteRoomRsp struct {
  */
 type JoinRoom struct {
 	ID int
+}
+
+/**
+ * @api {WS} JoinRoomRsp JoinRoomRsp
+ * @apiVersion 1.0.0
+ * @apiGroup Room
+ * @apiPermission server
+ * @apiName JoinRoomRsp
+ * @apiDescription Join room rsp
+ *
+ * @apiParam {int} Code 0 for success <br> 1 for full <br> 2 for in another room <br> 3 for no room
+ * @apiParam {-} Info see [NewRoomRsp](#api-Room-NewRoomRsp)
+ */
+type JoinRoomRsp struct {
+	Code int
+	Info RoomInfo
+}
+
+/**
+ * @api {WS} ReadyRoom ReadyRoom
+ * @apiVersion 1.0.0
+ * @apiGroup Room
+ * @apiPermission client
+ * @apiName ReadyRoom
+ * @apiDescription Get ready
+ *
+ * @apiParam {int} Ready 1 for ready
+ */
+type ReadyRoom struct {
+	Ready int
+}
+
+/**
+ * @api {WS} ExitRoom ExitRoom
+ * @apiVersion 1.0.0
+ * @apiGroup Room
+ * @apiPermission client
+ * @apiName ExitRoom
+ * @apiDescription Exit room
+ */
+type ExitRoom struct {
 }
 
 /**

@@ -30,6 +30,22 @@
   },
   {
     "type": "WS",
+    "url": "ExitRoom",
+    "title": "ExitRoom",
+    "version": "1.0.0",
+    "group": "Room",
+    "permission": [
+      {
+        "name": "client"
+      }
+    ],
+    "name": "ExitRoom",
+    "description": "<p>Exit room</p>",
+    "filename": "msg/room_msg.go",
+    "groupTitle": "Room"
+  },
+  {
+    "type": "WS",
     "url": "GetRooms",
     "title": "GetRooms",
     "version": "1.0.0",
@@ -96,6 +112,71 @@
             "optional": false,
             "field": "RoomInfo",
             "description": "<p>Room info, see <a href=\"#api-Room-NewRoomRsp\">NewRoomRsp</a></p>"
+          }
+        ]
+      }
+    },
+    "filename": "msg/room_msg.go",
+    "groupTitle": "Room"
+  },
+  {
+    "type": "WS",
+    "url": "JoinRoom",
+    "title": "JoinRoom",
+    "version": "1.0.0",
+    "group": "Room",
+    "permission": [
+      {
+        "name": "client"
+      }
+    ],
+    "name": "JoinRoom",
+    "description": "<p>Join room</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "int",
+            "optional": false,
+            "field": "ID",
+            "description": "<p>room id</p>"
+          }
+        ]
+      }
+    },
+    "filename": "msg/room_msg.go",
+    "groupTitle": "Room"
+  },
+  {
+    "type": "WS",
+    "url": "JoinRoomRsp",
+    "title": "JoinRoomRsp",
+    "version": "1.0.0",
+    "group": "Room",
+    "permission": [
+      {
+        "name": "server"
+      }
+    ],
+    "name": "JoinRoomRsp",
+    "description": "<p>Join room rsp</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "int",
+            "optional": false,
+            "field": "Code",
+            "description": "<p>0 for success <br> 1 for full <br> 2 for in another room <br> 3 for no room</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "<ul> <li></li> </ul>",
+            "optional": false,
+            "field": "Info",
+            "description": "<p>see <a href=\"#api-Room-NewRoomRsp\">NewRoomRsp</a></p>"
           }
         ]
       }
@@ -203,6 +284,72 @@
             "optional": false,
             "field": "Status",
             "description": "<p>Room status <br> 0 for waiting <br> 1 for gaming</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "RoomMember",
+            "optional": false,
+            "field": "Member",
+            "description": "<p>Room member</p>"
+          }
+        ],
+        "RoomMember": [
+          {
+            "group": "RoomMember",
+            "type": "int",
+            "optional": false,
+            "field": "ID",
+            "description": "<p>Member ID</p>"
+          },
+          {
+            "group": "RoomMember",
+            "type": "string",
+            "optional": false,
+            "field": "Name",
+            "description": "<p>Member name</p>"
+          },
+          {
+            "group": "RoomMember",
+            "type": "int",
+            "optional": false,
+            "field": "Team",
+            "description": "<p>Member team</p>"
+          },
+          {
+            "group": "RoomMember",
+            "type": "int",
+            "optional": false,
+            "field": "Ready",
+            "description": "<p>1 for ready</p>"
+          }
+        ]
+      }
+    },
+    "filename": "msg/room_msg.go",
+    "groupTitle": "Room"
+  },
+  {
+    "type": "WS",
+    "url": "ReadyRoom",
+    "title": "ReadyRoom",
+    "version": "1.0.0",
+    "group": "Room",
+    "permission": [
+      {
+        "name": "client"
+      }
+    ],
+    "name": "ReadyRoom",
+    "description": "<p>Get ready</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "int",
+            "optional": false,
+            "field": "Ready",
+            "description": "<p>1 for ready</p>"
           }
         ]
       }
