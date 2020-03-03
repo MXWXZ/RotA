@@ -17,7 +17,12 @@ var Server struct {
 	MaxConnNum  int
 	ConsolePort int
 	ProfilePath string
+	DBAddr      string
 	DBName      string
+	DBUser      string
+	DBPass      string
+	RedisAddr   string
+	RedisPass   string
 }
 
 func init() {

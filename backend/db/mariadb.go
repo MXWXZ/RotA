@@ -2,7 +2,6 @@ package db
 
 import (
 	"fmt"
-	"os"
 	"rota/conf"
 	"time"
 
@@ -17,12 +16,19 @@ var RDBClient *gorm.DB = nil
 // InitRDB init the orm object
 func InitRDB(m ...interface{}) {
 	if RDBClient == nil {
-		conn := fmt.Sprintf("%s:%s@/%s?charset=utf8mb4&parseTime=True&loc=Local", os.Getenv("ROTA_DBUSER"), os.Getenv("ROTA_DBPASS"), conf.Server.DBName)
+		conn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+			conf.Server.DBUser, conf.Server.DBPass, conf.Server.DBAddr, conf.Server.DBName)
 
 		var err error
-		RDBClient, err = gorm.Open("mysql", conn)
-		if err != nil {
-			log.Fatal("%v", err)
+		for {
+			RDBClient, err = gorm.Open("mysql", conn)
+			if err != nil {
+				log.Error("%v", err)
+				time.Sleep(5 * time.Second)
+			} else {
+				log.Release("MariaDB connected")
+				break
+			}
 		}
 
 		RDBClient.AutoMigrate(m...)

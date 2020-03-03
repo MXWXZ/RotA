@@ -27,7 +27,6 @@ github.com/name5566/leaf/log
 github.com/name5566/leaf/module
 github.com/name5566/leaf/network
 github.com/name5566/leaf/network/json
-github.com/name5566/leaf/recordfile
 github.com/name5566/leaf/timer
 # google.golang.org/appengine v1.4.0
 google.golang.org/appengine/cloudsql

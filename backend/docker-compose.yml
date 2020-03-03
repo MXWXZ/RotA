@@ -1,0 +1,25 @@
+version: '3'
+services:
+  backend:
+    build: .
+    restart: always
+    volumes:
+      - ./log:/rota/log
+    depends_on:
+      - db
+      - redis
+    ports:
+      - 1926:1926
+      - 1927:1927
+  db:
+    image: "mariadb:latest"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: change_before_release
+      MYSQL_DATABASE: rota
+    volumes:
+      - ./data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+  redis:
+    image: "redis:alpine"
+    restart: always
